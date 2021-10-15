@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Models;
+use DateTime;
 
+use App\Models\UserDomicilio;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -17,10 +19,28 @@ class User extends Authenticatable
      *
      * @var string[]
      */
+    protected $appends = ['edad','UsuarioDomicilio'];
+
+    public function getedadAttribute(){
+        $nacimiento = new DateTime($this->fecha_nacimiento);
+        $ahora = new DateTime(date("Y-m-d"));
+        $diferencia = $ahora->diff($nacimiento);
+        return $diferencia->format("%y");
+    }
+
+    public function getUsuarioDomicilioAttribute(){
+      return $this->domicilio->toArray();
+    }
+    public function domicilio()
+    {
+        return $this->hasOne(UserDomicilio::class);
+    }
     protected $fillable = [
         'name',
         'email',
         'password',
+
+        'fecha_nacimiento'
     ];
 
     /**
